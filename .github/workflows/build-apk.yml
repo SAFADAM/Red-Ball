@@ -1,0 +1,50 @@
+name: APK Oluşturucu
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Repositoriyi Çek
+      uses: actions/checkout@v4
+
+    - name: Node.js Kur
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Java JDK Kur
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: Android SDK Kur
+      uses: android-actions/setup-android@v3
+
+    - name: Dosyaları Hazırla ve Capacitor Yükle
+      run: |
+        mkdir -p www
+        cp index.html www/
+        npm init -y
+        npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+        npx cap init "Red ball 400" "com.safadam.redball" --web-dir www
+        npx cap add android
+        npx cap copy android
+
+    - name: APK Derle (Build)
+      run: |
+        cd android
+        chmod +x gradlew
+        ./gradlew assembleDebug --no-daemon
+
+    - name: APK Dosyasını Yükle
+      uses: actions/upload-artifact@v4
+      with:
+        name: Redball
+        path: android/app/build/outputs/apk/debug/redball.apk
