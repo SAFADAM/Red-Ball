@@ -47,4 +47,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Redball
-        path: android/app/build/outputs/apk/debug/redball.apk
+        path: android/app/build/outputs/apk/redball/redball.apk
